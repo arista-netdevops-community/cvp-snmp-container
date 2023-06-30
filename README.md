@@ -1,5 +1,5 @@
 # cvp-snmp-with-kubernetes
-The goal of this project is to find a cleaner way to install SNMP monitoring ability on CVP: we would like a remote management access to be able to monitor basic CVP health state (CPU, memory, etc ...)
+The goal of this project is to find a cleaner way to install snmpd package on CVP: we would like a remote management SNMP system to be able to monitor basic CVP server information (CPU, memory, etc ...).
 Right now, our solution is described here: https://arista.my.site.com/AristaCommunity/s/article/snmpd-on-cvp  
 This solution is not the best as it involves installing new RPM packages with yum: this could create issue at the next upgrade.
 Moreover, the package installed (snmpd version 5.7), doesn't support modern cryptographic algorithm.   

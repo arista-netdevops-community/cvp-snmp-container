@@ -1,13 +1,13 @@
 # cvp-snmp-with-kubernetes
-The goal of this project is to find a cleaner way to install SNMP monitoring ability on CVP.   
-SNMP monitoring is a common access by big companies.   
+The goal of this project is to find a cleaner way to install SNMP monitoring ability on CVP: we would like a remote management access to be able to monitor basic CVP health state (CPU, memory, etc ...)
 Right now, our solution is described here: https://arista.my.site.com/AristaCommunity/s/article/snmpd-on-cvp  
-This solution is not the best as it involves installing new RPM packages with yum: this could create issue at the next upgrade.  
-The following project will install that in a Kubernetes pod to make it cleaner. 
+This solution is not the best as it involves installing new RPM packages with yum: this could create issue at the next upgrade.
+Moreover, the package installed (snmpd version 5.7), doesn't support modern cryptographic algorithm.   
+The following project will install snmpd in a Kubernetes pod to make a cleaner and easier to maintain solution. 
 
-Warning: Work in progress
+# Warning: Work in progress
 
-Warning 2: Kubeneretes will expose by default the port 30161. So this port needs to be used from the remote devices (NMS system for example).
+# Warning 2: Kubeneretes will expose by default the port UDP 30161. So this port needs to be used from the remote devices (NMS system for example).
 
 # Installation process
 

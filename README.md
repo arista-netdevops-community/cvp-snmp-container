@@ -36,8 +36,7 @@ agentuser root
 
 ## Step 3: Create the Kubernetes deployment and service: 
 ```
-kubectl apply -f deployment-snmpd.yaml
-kubectl apply -f service-snmpd.yaml
+kubectl apply -f snmpd-monitor.yaml
 ```
 
 

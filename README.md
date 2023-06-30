@@ -32,15 +32,22 @@ nerdctl image ls  | grep snmp
 ```
 
 ## Step 2: Modify the snmpd.conf file to match your requirements.  
-By default, the configuration file has the following content (using v2c and "testing" community string): 
+By default, the configuration file has the following content (using v2c "testing" community string, and v3 arista user): 
 ```
 $ cat snmpd.conf 
-rocommunity testing
-sysname "cvp-server-1"
-syslocation "cvp-location"
+# Global information
+sysname "arista-cvp-server-1"
+syslocation "arista-cvp-location"
 syscontact "admin"
 agentAddress udp:161
+
+# For SNMPv2c
 agentuser root
+rocommunity testing
+
+# For SNMPv3:
+createUser arista SHA-512 "arista1234" AES-256 "arista1234"
+rouser arista
 ```
 
 ## Step 3: Create the Kubernetes deployment and service: 

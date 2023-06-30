@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: snmpd-gigi
+  name: snmpd-gigi
+spec:
+  ports:
+  - name: snmp-monitoring-port
+    nodePort: 30161
+    port: 161
+    protocol: UDP
+    targetPort: 161
+  selector:
+    app: snmpd-gigi
+  type: NodePort
+status:
+  loadBalancer: {}

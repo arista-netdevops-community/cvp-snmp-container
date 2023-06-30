@@ -5,6 +5,10 @@ Right now, our solution is described here: https://arista.my.site.com/AristaComm
 This solution is not the best as it involves installing new RPM packages with yum: this could create issue at the next upgrade.  
 The following project will install that in a Kubernetes pod to make it cleaner. 
 
+Warning: Work in progress
+
+Warning 2: Kubeneretes will expose by default the port 30161. So this port needs to be used from the remote devices (NMS system for example).
+
 # Installation process
 
 ## Step 1: Get the files in your CVP server in the /cvpi directory
@@ -36,7 +40,23 @@ kubectl apply -f service-snmpd.yaml
 ```
 
 
-## Step 5: Test from a remote device (for example an Arista switch)
+## Step 5: Validation 
+## From the CVP server, we can verify the status of the pods, deployment and service:
 ```
-$ snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get pods -l app=snmpd-gigi
+NAME                          READY   STATUS    RESTARTS   AGE
+snmpd-gigi-74dc9bc6cb-prgdq   1/1     Running   0          2m31s
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get deployment -l app=snmpd-gigi
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+snmpd-gigi   1/1     1            1           2m48s
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get service -l app=snmpd-gigi
+NAME         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)         AGE
+snmpd-gigi   NodePort   172.31.195.167   <none>        161:30161/UDP   2m54s
+
+```
+
+## from a remote device (for example an Arista switch) do a SNMP query:
+```
+[admin@psp119 ~]$ snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
+HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (686427589) 79 days, 10:44:35.89
 ```

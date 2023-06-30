@@ -42,16 +42,24 @@ kubectl apply -f service-snmpd.yaml
 
 ## Step 5: Validation 
 ## From the CVP server, we can verify the status of the pods, deployment and service:
+
 ```
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get pods -l app=snmpd-gigi
-NAME                          READY   STATUS    RESTARTS   AGE
-snmpd-gigi-74dc9bc6cb-prgdq   1/1     Running   0          2m31s
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get deployment -l app=snmpd-gigi
-NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-snmpd-gigi   1/1     1            1           2m48s
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get service -l app=snmpd-gigi
-NAME         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)         AGE
-snmpd-gigi   NodePort   172.31.195.167   <none>        161:30161/UDP   2m54s
+kubectl get pods -l app=snmpd-monitor
+kubectl get deployment -l app=snmpd-monitor
+kubectl get service -l app=snmpd-monitor
+```
+Expected output:
+```
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get pods -l app=snmpd-monitor
+NAME                            READY   STATUS    RESTARTS   AGE
+snmpd-monitor-9ddf89db6-m4xjc   1/1     Running   0          14s
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get deployment -l app=snmpd-monitor
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+snmpd-monitor   1/1     1            1           21s
+[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get service -l app=snmpd-monitor
+NAME            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE
+snmpd-monitor   NodePort   172.31.232.25   <none>        161:30161/UDP   26s
+
 
 ```
 

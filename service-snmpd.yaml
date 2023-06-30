@@ -3,8 +3,8 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: snmpd-gigi
-  name: snmpd-gigi
+    app: snmpd-monitor
+  name: snmpd-monitor
 spec:
   ports:
   - name: snmp-monitoring-port
@@ -13,7 +13,7 @@ spec:
     protocol: UDP
     targetPort: 161
   selector:
-    app: snmpd-gigi
+    app: snmpd-monitor
   type: NodePort
 status:
   loadBalancer: {}

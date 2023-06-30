@@ -3,31 +3,31 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: snmpd-gigi
-  name: snmpd-gigi
+    app: snmpd-monitor
+  name: snmpd-monitor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: snmpd-gigi
+      app: snmpd-monitor
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: snmpd-gigi
+        app: snmpd-monitor
     spec:
       containers:
       - image: polinux/snmpd:latest
-        name: snmpd-gigi
+        name: snmpd-monitor
         volumeMounts:
         - mountPath: /etc/snmp/snmpd.conf
-          name: volume-gigi-snmpd
+          name: volume-snmpd-monitor
         ports: 
         - containerPort: 161
         resources: {}
       volumes:
-      - name: volume-gigi-snmpd
+      - name: volume-snmpd-monitor
         hostPath:
         # directory location on host
           path: /cvpi/cvp-snmp-monitor-with-kubernetes/snmpd.conf

@@ -23,6 +23,8 @@ spec:
         volumeMounts:
         - mountPath: /etc/snmp/snmpd.conf
           name: volume-snmpd-monitor
+        - mountPath: /host-root
+          name: host-root-partition
         ports: 
         - containerPort: 161
         resources: {}
@@ -32,4 +34,29 @@ spec:
         # directory location on host
           path: /cvpi/cvp-snmp-monitor-with-kubernetes/snmpd.conf
           type: FileOrCreate
+      - name: host-root-partition
+        hostPath:
+        # directory location on host
+          path: /
+          type: Directory
 status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: snmpd-monitor
+  name: snmpd-monitor
+spec:
+  ports:
+  - name: snmp-monitoring-port
+    nodePort: 30161
+    port: 161
+    protocol: UDP
+    targetPort: 161
+  selector:
+    app: snmpd-monitor
+  type: NodePort
+status:
+  loadBalancer: {}

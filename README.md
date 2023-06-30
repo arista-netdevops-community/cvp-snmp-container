@@ -22,25 +22,26 @@ Otherwise, just download the package as a zip and copy it manually to the CVP se
 
 
 
-## Step 3: Modify the snmpd.conf file to match your requirements.  
+## Step 2: Modify the snmpd.conf file to match your requirements.  
 By default, the configuration file has the following content (using v2c and "testing" community string): 
 ```
-$ cat snmpd.conf
+$ cat snmpd.conf 
 rocommunity testing
-syslocation “NewEngland”
+sysname "cvp-server-1"
+syslocation "cvp-location"
 syscontact "admin"
 agentAddress udp:161
 agentuser root
 ```
 
-## Step 4: Create the Kubernetes deployment and service: 
+## Step 3: Create the Kubernetes deployment and service: 
 ```
 kubectl apply -f deployment-snmpd.yaml
 kubectl apply -f service-snmpd.yaml
 ```
 
 
-## Step 5: Validation 
+## Step 4: Validation 
 ## From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```

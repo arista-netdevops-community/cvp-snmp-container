@@ -18,9 +18,18 @@ cd /cvpi/
 git clone https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes.git
 cd cvp-snmp-monitor-with-kubernetes/
 ```
-Otherwise, just download the package as a zip and copy it manually to the CVP server
+Otherwise, just download the package as a zip and copy it manually to the CVP server.  
+  
+Then, we will need to load the container image:
+```
+tar -xf net_snmp_image.tar.gz
+ctr image import net_snmp_image
+```
 
-
+Verification: 
+```
+nerdctl image ls  | grep snmp
+```
 
 ## Step 2: Modify the snmpd.conf file to match your requirements.  
 By default, the configuration file has the following content (using v2c and "testing" community string): 
@@ -65,6 +74,6 @@ snmpd-monitor   NodePort   172.31.232.25   <none>        161:30161/UDP   26s
 
 ## from a remote device (for example an Arista switch) do a SNMP query:
 ```
-[admin@psp119 ~]$ snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
-HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (686427589) 79 days, 10:44:35.89
+psp119...17:19:39#bash snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
+HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (689141680) 79 days, 18:16:56.80
 ```

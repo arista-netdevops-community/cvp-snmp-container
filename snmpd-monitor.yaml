@@ -18,7 +18,7 @@ spec:
         app: snmpd-monitor
     spec:
       containers:
-      - image: polinux/snmpd:latest
+      - image: net_snmp_image:5.9
         name: snmpd-monitor
         volumeMounts:
         - mountPath: /etc/snmp/snmpd.conf

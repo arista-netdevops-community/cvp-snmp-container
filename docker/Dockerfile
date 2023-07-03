@@ -17,6 +17,6 @@ CMD ["/bootstrap.sh"]
 
 # Commands to build and save the image
 
-# docker build -t net_snmp_image:5.9 .
-# docker save net_snmp_image:5.9 -o net_snmp_image
-# tar -zcvf ../net_snmp_image.tar.gz net_snmp_image
+# docker build -t net_snmp_image:latest .
+# docker save net_snmp_image:latest -o net_snmp_image
+# tar -zcvf ../net_snmp_image-v5.9.tar.gz net_snmp_image

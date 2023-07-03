@@ -1,45 +1,3 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
-    app: snmpd-monitor
-  name: snmpd-monitor
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: snmpd-monitor
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: snmpd-monitor
-    spec:
-      containers:
-      - image: net_snmp_image:5.9
-        name: snmpd-monitor
-        volumeMounts:
-        - mountPath: /etc/snmp/snmpd.conf
-          name: volume-snmpd-monitor
-        - mountPath: /host-root
-          name: host-root-partition
-        ports: 
-        - containerPort: 161
-        resources: {}
-      volumes:
-      - name: volume-snmpd-monitor
-        hostPath:
-        # directory location on host
-          path: /cvpi/cvp-snmp-monitor-with-kubernetes/snmpd.conf
-          type: FileOrCreate
-      - name: host-root-partition
-        hostPath:
-        # directory location on host
-          path: /
-          type: Directory
-status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -60,3 +18,49 @@ spec:
   type: NodePort
 status:
   loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: snmpd-monitor
+  name: snmpd-monitor
+spec:
+  selector:
+    matchLabels:
+      app: snmpd-monitor
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: snmpd-monitor
+    spec:
+      containers:
+      - image: net_snmp_image:latest
+        imagePullPolicy: Never
+        name: snmpd-monitor
+        volumeMounts:
+        - mountPath: /etc/snmp/snmpd.conf
+          name: volume-snmpd-monitor
+        - mountPath: /host-root
+          name: host-root-partition
+        ports: 
+        - containerPort: 161
+        resources: {}
+      volumes:
+      - name: volume-snmpd-monitor
+        hostPath:
+        # directory location on host
+          path: /cvpi/snmpd.conf
+          type: FileOrCreate
+      - name: host-root-partition
+        hostPath:
+        # directory location on host
+          path: /
+          type: Directory
+status:
+  currentNumberScheduled: 0
+  desiredNumberScheduled: 0
+  numberMisscheduled: 0
+  numberReady: 0

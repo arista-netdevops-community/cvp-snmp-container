@@ -22,19 +22,30 @@ Otherwise, just download the package as a zip and copy it manually to the CVP se
   
 Then, we will need to load the container image:
 ```
-tar -xf net_snmp_image.tar.gz
+```
+If CVP >= 2022.2.0 (TODO: To confirm this version)
+```
+tar -xf net_snmp_image-v5.9.tar.gz
 ctr image import net_snmp_image
-```
-
-Verification: 
-```
+# Verification: 
 nerdctl image ls  | grep snmp
 ```
 
-## Step 2: Modify the snmpd.conf file to match your requirements.  
+Otherwise, use the following command: 
+```
+tar -xf net_snmp_image-v5.9.tar.gz
+docker load -i net_snmp_image
+# Verification:
+docker image ls | grep snmp
+```
+
+## Step 2: Modify the snmpd.conf files to match your requirements.  
+The following files needs the be modified: 
+* snmpd-primary.conf
+* snmpd-secondary.conf
+* snmpd-tertiary.conf
 By default, the configuration file has the following content (using v2c "testing" community string, and v3 arista user): 
 ```
-$ cat snmpd.conf 
 # Global information
 sysname "arista-cvp-server-1"
 syslocation "arista-cvp-location"
@@ -50,13 +61,23 @@ createUser arista SHA-512 "arista1234" AES-256 "arista1234"
 rouser arista
 ```
 
-## Step 3: Create the Kubernetes deployment and service: 
+## Step 3: Copy the files to the correct location:
+This needs to be run on the primary server. You can ignore the last 2 lines if you are on a single-node cluster.
+```
+su cvp
+cp snmpd-primary.conf /cvpi/snmpd.conf
+scp snmpd-secondary.conf root@SECONDARY_HOSTNAME:/cvpi/snmpd.conf
+scp snmpd-tertiary.conf root@TERTIARY_HOSTNAME:/cvpi/snmpd.conf
+```
+
+## Step 4: Create the Kubernetes deployment and service: 
+This needs to be run only on the primary server.
 ```
 kubectl apply -f snmpd-monitor.yaml
 ```
 
 
-## Step 4: Validation 
+## Step 5: Validation 
 ## From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```

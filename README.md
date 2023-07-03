@@ -20,13 +20,12 @@ cd cvp-snmp-monitor-with-kubernetes/
 ```
 Otherwise, just download the package as a zip and copy it manually to the CVP server.  
   
-Then, we will need to load the container image:
-```
-```
+Then, we will need to load the container image.
 If CVP >= 2022.2.0 (TODO: To confirm this version)
 ```
 tar -xf net_snmp_image-v5.9.tar.gz
 ctr image import net_snmp_image
+
 # Verification: 
 nerdctl image ls  | grep snmp
 ```
@@ -35,6 +34,7 @@ Otherwise, use the following command:
 ```
 tar -xf net_snmp_image-v5.9.tar.gz
 docker load -i net_snmp_image
+
 # Verification:
 docker image ls | grep snmp
 ```
@@ -43,8 +43,9 @@ docker image ls | grep snmp
 The following files needs the be modified: 
 * snmpd-primary.conf
 * snmpd-secondary.conf
-* snmpd-tertiary.conf
-By default, the configuration file has the following content (using v2c "testing" community string, and v3 arista user): 
+* snmpd-tertiary.conf  
+
+By default, the configuration files have the following content (using v2c "testing" community string, and v3 arista user): 
 ```
 # Global information
 sysname "arista-cvp-server-1"
@@ -103,5 +104,7 @@ snmpd-monitor   NodePort   172.31.232.25   <none>        161:30161/UDP   26s
 ## from a remote device (for example an Arista switch) do a SNMP query:
 ```
 psp119...17:19:39#bash snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
+
+
 HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (689141680) 79 days, 18:16:56.80
 ```

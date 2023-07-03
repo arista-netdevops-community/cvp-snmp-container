@@ -12,38 +12,17 @@ The following project will install snmpd in a Kubernetes pod to make a cleaner a
 # Installation process
 
 ## Step 1: Get the files in your CVP server in the /cvpi directory
-### If within the Arista network you can git clone directly from the CVP server:
+### If within the Arista network you can git clone directly from the CVP server to the primary node:
 ```
+su cvp
 cd /cvpi/
 git clone https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes.git
 cd cvp-snmp-monitor-with-kubernetes/
+
 ```
 Otherwise, just download the package as a zip and copy it manually to the CVP server.  
-  
-Then, we will need to load the container image.
-If CVP >= 2022.2.0 (TODO: To confirm this version)
-```
-tar -xf net_snmp_image-v5.9.tar.gz
-ctr image import net_snmp_image
-
-# Verification: 
-nerdctl image ls  | grep snmp
-```
-
-Otherwise, use the following command: 
-```
-tar -xf net_snmp_image-v5.9.tar.gz
-docker load -i net_snmp_image
-
-# Verification:
-docker image ls | grep snmp
-```
 
 ## Step 2: Modify the snmpd.conf files to match your requirements.  
-The following files needs the be modified: 
-* snmpd-primary.conf
-* snmpd-secondary.conf
-* snmpd-tertiary.conf  
 
 By default, the configuration files have the following content (using v2c "testing" community string, and v3 arista user): 
 ```
@@ -62,23 +41,40 @@ createUser arista SHA-512 "arista1234" AES-256 "arista1234"
 rouser arista
 ```
 
-## Step 3: Copy the files to the correct location:
-This needs to be run on the primary server. You can ignore the last 2 lines if you are on a single-node cluster.
+## Step 3: Copy the directory and config files to the correct location.
+This needs to be run on the primary server. You can ignore the last 2 section if you are on a single-node cluster
 ```
 su cvp
-cp snmpd-primary.conf /cvpi/snmpd.conf
-scp snmpd-secondary.conf root@SECONDARY_HOSTNAME:/cvpi/snmpd.conf
-scp snmpd-tertiary.conf root@TERTIARY_HOSTNAME:/cvpi/snmpd.conf
+cp snmpd.conf /cvpi/snmpd.conf
 ```
 
-## Step 4: Create the Kubernetes deployment and service: 
+## Step 4: Load the container image.
+For CVP version >= 2022.3.0 :
+```
+tar -xf net_snmp_image-v5.9.tar.gz && ctr image import net_snmp_image
+
+# Verification: 
+nerdctl image ls  | grep snmp
+```
+
+For older CVP version, use the following command: 
+```
+tar -xf net_snmp_image-v5.9.tar.gz && sudo docker load -i net_snmp_image
+
+# Verification:
+sudo docker image ls | grep snmp
+```
+
+## Step 5: If in a multi-node cluster, repeat Step 1, 2, 3 and 4 on the secondary node and tertiary node.
+
+## Step 6: Create the Kubernetes deployment and service: 
 This needs to be run only on the primary server.
 ```
 kubectl apply -f snmpd-monitor.yaml
 ```
 
 
-## Step 5: Validation 
+## Step 6: Validation 
 ## From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```

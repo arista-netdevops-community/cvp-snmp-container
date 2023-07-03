@@ -73,7 +73,7 @@ kubectl apply -f snmpd-monitor.yaml
 ```
 
 
-## Step 6: Validation 
+## Step 7: Validation 
 ## From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```

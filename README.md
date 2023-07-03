@@ -12,15 +12,16 @@ The following project will install snmpd in a Kubernetes pod to make a cleaner a
 # Installation process
 
 ## Step 1: Get the files in your CVP server in the /cvpi directory
-### If within the Arista network you can git clone directly from the CVP server to the primary node:
+### If within the Arista network you can download it directly from the CVP server to the primary node:
 ```
 su cvp
 cd /cvpi/
-git clone https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes.git
-cd cvp-snmp-monitor-with-kubernetes/
+wget https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes/-/archive/main/cvp-snmp-monitor-with-kubernetes-main.tar.gz
+tar -xf cvp-snmp-monitor-with-kubernetes-main.tar.gz
+cd cvp-snmp-monitor-with-kubernetes-main/
 
 ```
-Otherwise, just download the package as a zip and copy it manually to the CVP server.  
+Otherwise, just download the package as a .tar.gz to your computer and scp it manually to the CVP server.  
 
 ## Step 2: Modify the snmpd.conf files to match your requirements.  
 
@@ -50,10 +51,10 @@ cp snmpd.conf /cvpi/snmpd.conf
 ## Step 4: Load the container image.
 For CVP version >= 2022.3.0 :
 ```
-tar -xf net_snmp_image-v5.9.tar.gz && ctr image import net_snmp_image
+tar -xf net_snmp_image-v5.9.tar.gz && sudo ctr image import net_snmp_image
 
 # Verification: 
-nerdctl image ls  | grep snmp
+sudo nerdctl image ls  | grep snmp
 ```
 
 For older CVP version, use the following command: 
@@ -83,16 +84,17 @@ kubectl get service -l app=snmpd-monitor
 ```
 Expected output:
 ```
-[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get pods -l app=snmpd-monitor -o wide 
+$ kubectl get pods -l app=snmpd-monitor -o wide 
 NAME                  READY   STATUS    RESTARTS   AGE     IP             NODE                               NOMINATED NODE   READINESS GATES
 snmpd-monitor-jg9v6   1/1     Running   0          3m46s   10.42.40.144   cva-3-cvp.ire.aristanetworks.com   <none>           <none>
 snmpd-monitor-l66jt   1/1     Running   0          3m46s   10.42.8.190    cva-2-cvp.ire.aristanetworks.com   <none>           <none>
 snmpd-monitor-nlxxf   1/1     Running   0          3m46s   10.42.65.128   cva-1-cvp.ire.aristanetworks.com   <none>           <none>
 
-[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get daemonset -l app=snmpd-monitor
+$ kubectl get daemonset -l app=snmpd-monitor
 NAME            DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 snmpd-monitor   3         3         3       3            3           <none>          30s
-[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get service -l app=snmpd-monitor
+
+$ kubectl get service -l app=snmpd-monitor
 NAME            TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)         AGE
 snmpd-monitor   NodePort   10.42.217.23   <none>        161:30161/UDP   18s
 
@@ -100,8 +102,12 @@ snmpd-monitor   NodePort   10.42.217.23   <none>        161:30161/UDP   18s
 
 ## from a remote device (for example an Arista switch) do a SNMP query:
 ```
-psp119...17:19:39#bash snmpwalk -v2c -c testing 10.83.13.33:30161 HOST-RESOURCES-MIB::hrSystemUptime
+# Get sysname
+switch#bash snmpwalk -v2c -c testing 172.28.161.170:30161 1.3.6.1.2.1.1.5.0
+SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 
+# Get uptime
+switch#bash snmpwalk -v2c -c testing 172.28.161.170:30161 1.3.6.1.2.1.25.1.1
+HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (36197997) 4 days, 4:32:59.97
 
-HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (689141680) 79 days, 18:16:56.80
 ```

@@ -111,3 +111,9 @@ switch#bash snmpwalk -v2c -c testing 172.28.161.170:30161 1.3.6.1.2.1.25.1.1
 HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (36197997) 4 days, 4:32:59.97
 
 ```
+
+# SNMP for CVA appliance
+If you would need to monitor the CVA appliance, the above steps will not work as the CVAs are not part of a Kubernetes cluster.
+We would advise to use the SNMP capability of the iDRAC interface. 
+You can find more information about this here: 
+https://www.arista.com/en/qsg-cva-200cv-250cv/cva-200cv-250cv-snmp-monitoring-support

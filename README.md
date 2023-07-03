@@ -77,17 +77,18 @@ kubectl apply -f snmpd-monitor.yaml
 ## From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```
-kubectl get pods -l app=snmpd-monitor
+kubectl get pods -l app=snmpd-monitor -o wide 
 kubectl get daemonset -l app=snmpd-monitor
 kubectl get service -l app=snmpd-monitor
 ```
 Expected output:
 ```
-[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get pods -l app=snmpd-monitor
-NAME                  READY   STATUS    RESTARTS   AGE
-snmpd-monitor-jg9v6   1/1     Running   0          17s
-snmpd-monitor-l66jt   1/1     Running   0          17s
-snmpd-monitor-nlxxf   1/1     Running   0          17s
+[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get pods -l app=snmpd-monitor -o wide 
+NAME                  READY   STATUS    RESTARTS   AGE     IP             NODE                               NOMINATED NODE   READINESS GATES
+snmpd-monitor-jg9v6   1/1     Running   0          3m46s   10.42.40.144   cva-3-cvp.ire.aristanetworks.com   <none>           <none>
+snmpd-monitor-l66jt   1/1     Running   0          3m46s   10.42.8.190    cva-2-cvp.ire.aristanetworks.com   <none>           <none>
+snmpd-monitor-nlxxf   1/1     Running   0          3m46s   10.42.65.128   cva-1-cvp.ire.aristanetworks.com   <none>           <none>
+
 [cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get daemonset -l app=snmpd-monitor
 NAME            DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 snmpd-monitor   3         3         3       3            3           <none>          30s

@@ -41,8 +41,7 @@ createUser arista SHA-512 "arista1234" AES-256 "arista1234"
 rouser arista
 ```
 
-## Step 3: Copy the directory and config files to the correct location.
-This needs to be run on the primary server. You can ignore the last 2 section if you are on a single-node cluster
+## Step 3: Copy the config file to the correct location.
 ```
 su cvp
 cp snmpd.conf /cvpi/snmpd.conf
@@ -79,21 +78,22 @@ kubectl apply -f snmpd-monitor.yaml
 
 ```
 kubectl get pods -l app=snmpd-monitor
-kubectl get deployment -l app=snmpd-monitor
+kubectl get daemonset -l app=snmpd-monitor
 kubectl get service -l app=snmpd-monitor
 ```
 Expected output:
 ```
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get pods -l app=snmpd-monitor
-NAME                            READY   STATUS    RESTARTS   AGE
-snmpd-monitor-9ddf89db6-m4xjc   1/1     Running   0          14s
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get deployment -l app=snmpd-monitor
-NAME            READY   UP-TO-DATE   AVAILABLE   AGE
-snmpd-monitor   1/1     1            1           21s
-[root@cvp-ire-pod2 cvp-snmp-monitor-with-kubernetes]# kubectl get service -l app=snmpd-monitor
-NAME            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE
-snmpd-monitor   NodePort   172.31.232.25   <none>        161:30161/UDP   26s
-
+[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get pods -l app=snmpd-monitor
+NAME                  READY   STATUS    RESTARTS   AGE
+snmpd-monitor-jg9v6   1/1     Running   0          17s
+snmpd-monitor-l66jt   1/1     Running   0          17s
+snmpd-monitor-nlxxf   1/1     Running   0          17s
+[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get daemonset -l app=snmpd-monitor
+NAME            DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+snmpd-monitor   3         3         3       3            3           <none>          30s
+[cvp@cva-1-cvp cvp-snmp-monitor-with-kubernetes]$ kubectl get service -l app=snmpd-monitor
+NAME            TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)         AGE
+snmpd-monitor   NodePort   10.42.217.23   <none>        161:30161/UDP   18s
 
 ```
 

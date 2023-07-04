@@ -1,20 +1,17 @@
 # cvp-snmp-with-kubernetes
-The goal of this project is to find a cleaner way to install snmpd package on CVP: we would like a remote management SNMP system to be able to monitor basic CVP server information (CPU, memory, etc ...).
+The goal of this project is to find a cleaner way to install snmpd packages on CVP: we would like a remote management SNMP system to be able to monitor basic CVP server information (CPU, memory, disk space, ...).
 Right now, our solution is described here: https://arista.my.site.com/AristaCommunity/s/article/snmpd-on-cvp  
-This solution is not the best as it involves installing new RPM packages with yum: this could create issue at the next upgrade.
-Moreover, the package installed (snmpd version 5.7), doesn't support modern cryptographic algorithm.   
-The following project will install snmpd in a Kubernetes pod to make a cleaner and easier to maintain solution. 
+This solution is not the best as it involves installing new RPM packages with yum: this could create issues at the next upgrade.
+Moreover, the package installed (snmpd version 5.7), doesn't support modern cryptographic algorithms (such as SHA-512 or AES-256).   
+The following project will install snmpd in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
 
-# Warning: Work in progress
-
-# Warning 2: Kubeneretes will expose by default the port UDP 30161. So this port needs to be used from the remote devices (NMS system for example).
+# Warning: Kubernetes will expose by default the port UDP 30161. So this port needs to be used from the remote devices (NMS system for example).
 
 # Installation process
 
 ## Step 1: Get the files in your CVP server in the /cvpi directory
-### If within the Arista network you can download it directly from the CVP server to the primary node:
+### If CloudVision has access to the internet this can be downloaded directly to the CLI of the primary node:
 ```
-su cvp
 cd /cvpi/
 wget https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes/-/archive/main/cvp-snmp-monitor-with-kubernetes-main.tar.gz
 tar -xf cvp-snmp-monitor-with-kubernetes-main.tar.gz
@@ -44,25 +41,24 @@ rouser arista
 
 ## Step 3: Copy the config file to the correct location.
 ```
-su cvp
 cp snmpd.conf /cvpi/snmpd.conf
 ```
 
 ## Step 4: Load the container image.
 For CVP version >= 2022.3.0 :
 ```
-tar -xf net_snmp_image-v5.9.tar.gz && sudo ctr image import net_snmp_image
+tar -xf net_snmp_image-v5.9.tar.gz && nerdctl load -i net_snmp_image 
 
 # Verification: 
-sudo nerdctl image ls  | grep snmp
+nerdctl image ls  | grep snmp
 ```
 
-For older CVP version, use the following command: 
+For older CVP versions, use the following command: 
 ```
-tar -xf net_snmp_image-v5.9.tar.gz && sudo docker load -i net_snmp_image
+tar -xf net_snmp_image-v5.9.tar.gz && docker load -i net_snmp_image
 
 # Verification:
-sudo docker image ls | grep snmp
+docker image ls | grep snmp
 ```
 
 ## Step 5: If in a multi-node cluster, repeat Step 1, 2, 3 and 4 on the secondary node and tertiary node.
@@ -100,20 +96,42 @@ snmpd-monitor   NodePort   10.42.217.23   <none>        161:30161/UDP   18s
 
 ```
 
-## from a remote device (for example an Arista switch) do a SNMP query:
+## from a remote device (for example an Arista switch), do an SNMP query:
 ```
-# Get sysname
-switch#bash snmpwalk -v2c -c testing 172.28.161.170:30161 1.3.6.1.2.1.1.5.0
+# SNMPv2c - Get sysname:
+switch#bash snmpwalk -v2c -c testing 10.83.13.33:30161 1.3.6.1.2.1.1.5.0
 SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 
-# Get uptime
-switch#bash snmpwalk -v2c -c testing 172.28.161.170:30161 1.3.6.1.2.1.25.1.1
+# SNMPv2c - Get uptime:
+switch#bash snmpwalk -v2c -c testing 10.83.13.33:30161 1.3.6.1.2.1.25.1.1
 HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (36197997) 4 days, 4:32:59.97
 
+# SNMPv3 - Get sysname: 
+switch#bash snmpwalk -v3 -u arista 10.83.13.33:30161 -a SHA-512 -A arista1234 -x AES-256 -X arista1234 1.3.6.1.2.1.1.5.0
+SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
+
+```
+
+# How to update the SNMP configuration?
+In case you need to modify the SNMP configuration after installation is complete, please follow the below steps.   
+Step 1 - Modify the `/cvpi/snmpd.conf` file:
+```
+vi /cvpi/snmpd.conf
+```
+Step 2 - Delete and re-apply the Kubernetes daemonset and service:
+```
+kubectl delete -f cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
+kubectl apply -f cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
+```
+Step 3 - Verification: 
+```
+kubectl get pods -l app=snmpd-monitor -o wide 
+kubectl get daemonset -l app=snmpd-monitor
+kubectl get service -l app=snmpd-monitor
 ```
 
 # SNMP for CVA appliance
 If you would need to monitor the CVA appliance, the above steps will not work as the CVAs are not part of a Kubernetes cluster.
-We would advise to use the SNMP capability of the iDRAC interface. 
+We would advise using the SNMP capability of the iDRAC interface. 
 You can find more information about this here: 
 https://www.arista.com/en/qsg-cva-200cv-250cv/cva-200cv-250cv-snmp-monitoring-support

@@ -61,17 +61,29 @@ tar -xf net_snmp_image-v5.9.tar.gz && docker load -i net_snmp_image
 docker image ls | grep snmp
 ```
 
-## Step 5: If in a multi-node cluster, repeat Step 1, 2, 3 and 4 on the secondary node and tertiary node.
+## Step 5: Install a cron entry
+A cronjob needs to be configured to avoid any downtime after an upgrade of CVP is performed (as during the upgrade all the container images are flushed).  
+This can be accomplished by installing the following cron entry.  
+Use the following command to edit the crontab:
+```
+crontab -e
+```
+And add the following:
+```
+@reboot /cvpi/cvp-snmp-monitor-with-kubernetes-main/load_image_on_boot.sh >> /cvpi/cvp-snmp-monitor-with-kubernetes-main/cron.log 2>&1
+```
 
-## Step 6: Create the Kubernetes deployment and service: 
+## Step 6: If in a multi-node cluster, repeat Step 1, 2, 3, 4 and 5 on the secondary node and tertiary node.
+## Step 7: Create the Kubernetes deployment and service: 
 This needs to be run only on the primary server.
 ```
 kubectl apply -f snmpd-monitor.yaml
 ```
 
 
-## Step 7: Validation 
-## From the CVP server, we can verify the status of the pods, deployment and service:
+
+## Step 8: Validation
+From the CVP server, we can verify the status of the pods, deployment and service:
 
 ```
 kubectl get pods -l app=snmpd-monitor -o wide 
@@ -120,8 +132,8 @@ vi /cvpi/snmpd.conf
 ```
 Step 2 - Delete and re-apply the Kubernetes daemonset and service:
 ```
-kubectl delete -f cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
-kubectl apply -f cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
+kubectl delete -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
+kubectl apply -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
 ```
 Step 3 - Verification: 
 ```

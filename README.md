@@ -28,6 +28,9 @@ By default, the configuration files have the following content (using v2c "testi
 sysname "arista-cvp-server-1"
 syslocation "arista-cvp-location"
 syscontact "admin"
+
+# Warning: Do not modify this port as this is the port open INSIDE the Kubernetes pod. 
+# If you wish to modify the host port opened, check the snmpd-monitor.yaml file.
 agentAddress udp:161
 
 # For SNMPv2c

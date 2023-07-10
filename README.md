@@ -16,7 +16,7 @@ The following project will install snmpd version 5.9 in a Kubernetes pod to make
 
 ```shell
 cd /cvpi/
-wget https://github.com/arista-netdevops-community/cvp-snmp-container/-/archive/main/cvp-snmp-monitor-with-kubernetes-main.tar.gz
+wget https://github.com/arista-netdevops-community/cvp-snmp-container/archive/main.tar.gz
 tar -xf cvp-snmp-monitor-with-kubernetes-main.tar.gz
 cd cvp-snmp-monitor-with-kubernetes-main/
 ```

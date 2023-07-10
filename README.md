@@ -17,8 +17,8 @@ The following project will install snmpd version 5.9 in a Kubernetes pod to make
 ```shell
 cd /cvpi/
 wget https://github.com/arista-netdevops-community/cvp-snmp-container/archive/main.tar.gz
-tar -xf cvp-snmp-monitor-with-kubernetes-main.tar.gz
-cd cvp-snmp-monitor-with-kubernetes-main/
+tar -xf cvp-snmp-container-main.tar.gz
+cd cvp-snmp-container-main/
 ```
 
 Otherwise, just download the package as a .tar.gz to your computer and scp it manually to the CVP server.  
@@ -84,7 +84,7 @@ crontab -e
 And add the following:
 
 ```shell
-@reboot /cvpi/cvp-snmp-monitor-with-kubernetes-main/load_image_on_boot.sh >> /cvpi/cvp-snmp-monitor-with-kubernetes-main/cron.log 2>&1
+@reboot /cvpi/cvp-snmp-container-main/load_image_on_boot.sh >> /cvpi/cvp-snmp-container-main/cron.log 2>&1
 ```
 
 ## Step 6: If in a multi-node cluster, repeat Step 1, 2, 3, 4 and 5 on the secondary node and tertiary node.
@@ -155,8 +155,8 @@ vi /cvpi/snmpd.conf
 Step 2 - On one node (primary for example), delete and re-apply the Kubernetes daemonset and service:
 
 ```shell
-kubectl delete -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
-kubectl apply -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
+kubectl delete -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
+kubectl apply -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
 ```
 
 Step 3 - Verification:

@@ -9,6 +9,7 @@ metadata:
 spec:
   ports:
   - name: snmp-monitoring-port
+    # If required, modify here the port opened on the host side. The range of valid ports is 9000-32000.
     nodePort: 30161
     port: 161
     protocol: UDP

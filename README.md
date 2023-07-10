@@ -3,7 +3,7 @@ The goal of this project is to find a cleaner way to install snmpd packages on C
 Right now, our solution is described here: https://arista.my.site.com/AristaCommunity/s/article/snmpd-on-cvp  
 This solution is not the best as it involves installing new RPM packages with yum: this could create issues at the next upgrade.
 Moreover, the package installed (snmpd version 5.7), doesn't support modern cryptographic algorithms (such as SHA-512 or AES-256).   
-The following project will install snmpd in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
+The following project will install snmpd version 5.9 in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
 
 # Warning: Kubernetes will expose by default the port UDP 30161. So this port needs to be used from the remote devices (NMS system for example).
 
@@ -126,11 +126,11 @@ SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 
 # How to update the SNMP configuration?
 In case you need to modify the SNMP configuration after installation is complete, please follow the below steps.   
-Step 1 - Modify the `/cvpi/snmpd.conf` file:
+Step 1 - Modify the `/cvpi/snmpd.conf` file on each node:
 ```
 vi /cvpi/snmpd.conf
 ```
-Step 2 - Delete and re-apply the Kubernetes daemonset and service:
+Step 2 - On one node (primary for example), delete and re-apply the Kubernetes daemonset and service:
 ```
 kubectl delete -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml
 kubectl apply -f /cvpi/cvp-snmp-monitor-with-kubernetes-main/snmpd-monitor.yaml

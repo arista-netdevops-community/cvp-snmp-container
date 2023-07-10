@@ -10,20 +10,23 @@ The following project will install snmpd version 5.9 in a Kubernetes pod to make
 # Installation process
 
 ## Step 1: Get the files in your CVP server in the /cvpi directory
+
 ### If CloudVision has access to the internet this can be downloaded directly to the CLI of the primary node:
-```
+
+```shell
 cd /cvpi/
-wget https://gitlab.aristanetworks.com/guillaume.vilar/cvp-snmp-monitor-with-kubernetes/-/archive/main/cvp-snmp-monitor-with-kubernetes-main.tar.gz
+wget https://github.com/arista-netdevops-community/cvp-snmp-container/-/archive/main/cvp-snmp-monitor-with-kubernetes-main.tar.gz
 tar -xf cvp-snmp-monitor-with-kubernetes-main.tar.gz
 cd cvp-snmp-monitor-with-kubernetes-main/
-
 ```
+
 Otherwise, just download the package as a .tar.gz to your computer and scp it manually to the CVP server.  
 
 ## Step 2: Modify the snmpd.conf files to match your requirements.  
 
 By default, the configuration files have the following content (using v2c "testing" community string, and v3 arista user): 
-```
+
+```text
 # Global information
 sysname "arista-cvp-server-1"
 syslocation "arista-cvp-location"
@@ -43,7 +46,8 @@ rouser arista
 ```
 
 ## Step 3: Copy the config file to the correct location.
-```
+
+```shell
 cp snmpd.conf /cvpi/snmpd.conf
 ```
 

@@ -10,9 +10,10 @@ The package installed (snmpd version 5.9), does support modern cryptographic alg
 
 ## Installation process - cvpi integration
 
-1\. Download the files to the CVP servers
+1\. Download the files to the CVP servers (make sure to switch to the cvp user first)
 
 ```shell
+su cvp
 cd /cvpi/
 wget https://github.com/arista-netdevops-community/cvp-snmp-container/archive/main.tar.gz -O cvp-snmp-container-main.tar.gz
 tar -xf cvp-snmp-container-main.tar.gz

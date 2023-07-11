@@ -1,0 +1,25 @@
+# Use this config file for CVP versions older than 2022.3.0
+cvp-snmp:
+  bundle: {
+            "snmpd-monitor-image",
+            "snmpd-monitor"
+          }
+
+snmpd-monitor-image:
+  actions:
+    load:
+      command: [ "%{CVP_HOME}/bin/image-load.sh", "net_snmp_image" ]
+      nodes: { "*" }
+      deps:
+        docker: start
+      timeout: 300s
+
+snmpd-monitor:
+  kubernetes: true
+  status:
+    timeout: 120s
+  actions:
+    start:
+      deps:
+        snmpd-monitor-image: load
+        kubernetes: start

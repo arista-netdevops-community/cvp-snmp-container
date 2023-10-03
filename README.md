@@ -3,9 +3,11 @@
 > **Warning**
 > Disclaimer: This project is not an officially endorsed or supported Arista project, and should be treated as a best-effort initiative, without any guarantee of performance or reliability.
 
-The goal of this project is to find a cleaner way to install snmpd packages on CVP: this will allow a remote management SNMP system to monitor basic CVP server information (CPU, memory, disk space, ...).
-The following project will install snmpd version 5.9 in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
-The package installed (snmpd version 5.9), does support modern cryptographic algorithms (such as SHA-512 or AES-256).   
+The goal of this project is to find a cleaner way to install snmpd packages on CVP: this will allow a _remote management SNMP system to monitor basic CVP server information_ (CPU, memory, disk space, ...).
+
+The following project will install **snmpd** version `5.9` in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
+
+This snmpd package does support modern cryptographic algorithms (such as `SHA-512` or `AES-256`).
 
 > **Note**
 >  Kubernetes will expose by default the port UDP `30161`. So this port needs to be used from the remote devices (NMS system for example).

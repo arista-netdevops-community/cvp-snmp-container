@@ -1,25 +1,4 @@
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    app: snmpd-monitor
-  name: snmpd-monitor
-spec:
-  ports:
-  - name: snmp-monitoring-port
-    # If required, modify here the port opened on the host side. The range of valid ports is 9000-32000.
-    nodePort: 30161
-    port: 161
-    protocol: UDP
-    targetPort: 161
-  selector:
-    app: snmpd-monitor
-  type: NodePort
-status:
-  loadBalancer: {}
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -48,6 +27,8 @@ spec:
           name: host-root-partition
         ports: 
         - containerPort: 161
+          protocol: UDP
+          hostPort: 161
         resources: {}
       volumes:
       - name: volume-snmpd-monitor

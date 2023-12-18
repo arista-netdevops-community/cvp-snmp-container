@@ -10,7 +10,7 @@ The following project will install **snmpd** version `5.9` in a Kubernetes pod t
 This snmpd package does support modern cryptographic algorithms (such as `SHA-512` or `AES-256`).
 
 > **Note**
->  Kubernetes will expose by default the port UDP `30161`. So this port needs to be used from the remote devices (NMS system for example).
+>  Kubernetes will expose by default the port UDP `161` on each node. So this port needs to be used from the remote devices (NMS system for example).
 
 # Installation process
 
@@ -20,7 +20,7 @@ If CloudVision has access to the internet this can be downloaded directly to the
 
 ```shell
 cd /cvpi/
-wget https://github.com/arista-netdevops-community/cvp-snmp-container/archive/main.tar.gz
+wget https://github.com/arista-netdevops-community/cvp-snmp-container/archive/main.tar.gz -O cvp-snmp-container-main.tar.gz
 tar -xf cvp-snmp-container-main.tar.gz
 cd cvp-snmp-container-main/
 ```
@@ -98,7 +98,7 @@ And add the following:
 
 If in a multi-node cluster, repeat Step 1, 2, 3, 4 and 5 on the secondary node and tertiary node.
 
-## Step 7: Create the Kubernetes deployment and service: 
+## Step 7: Create the Kubernetes deployment:
 
 This needs to be run only on the primary server.
 
@@ -108,12 +108,11 @@ kubectl apply -f snmpd-monitor.yaml
 
 ## Step 8: Validation
 
-From the CVP server, we can verify the status of the pods, deployment and service:
+From the CVP server, we can verify the status of the pods and deployment:
 
 ```shell
 kubectl get pods -l app=snmpd-monitor -o wide 
 kubectl get daemonset -l app=snmpd-monitor
-kubectl get service -l app=snmpd-monitor
 ```
 
 ### Expected output
@@ -128,10 +127,6 @@ snmpd-monitor-nlxxf   1/1     Running   0          3m46s   10.42.65.128   cva-1-
 $ kubectl get daemonset -l app=snmpd-monitor
 NAME            DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 snmpd-monitor   3         3         3       3            3           <none>          30s
-
-$ kubectl get service -l app=snmpd-monitor
-NAME            TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)         AGE
-snmpd-monitor   NodePort   10.42.217.23   <none>        161:30161/UDP   18s
 ```
 
 ### SNMP query
@@ -140,15 +135,15 @@ From a remote device (for example an Arista switch), do an SNMP query:
 
 ```shell
 # SNMPv2c - Get sysname:
-switch#bash snmpwalk -v2c -c testing 10.83.13.33:30161 1.3.6.1.2.1.1.5.0
+switch#bash snmpwalk -v2c -c testing 10.83.13.33:161 1.3.6.1.2.1.1.5.0
 SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 
 # SNMPv2c - Get uptime:
-switch#bash snmpwalk -v2c -c testing 10.83.13.33:30161 1.3.6.1.2.1.25.1.1
+switch#bash snmpwalk -v2c -c testing 10.83.13.33:161 1.3.6.1.2.1.25.1.1
 HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (36197997) 4 days, 4:32:59.97
 
 # SNMPv3 - Get sysname: 
-switch#bash snmpwalk -v3 -u arista 10.83.13.33:30161 -a SHA-512 -A arista1234 -x AES-256 -X arista1234 1.3.6.1.2.1.1.5.0
+switch#bash snmpwalk -v3 -u arista 10.83.13.33:161 -a SHA-512 -A arista1234 -x AES-256 -X arista1234 1.3.6.1.2.1.1.5.0
 SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 ```
 
@@ -162,7 +157,7 @@ In case you need to modify the SNMP configuration after installation is complete
 vi /cvpi/snmpd.conf
 ```
 
-- Step 2 - On one node (primary for example), delete and re-apply the Kubernetes daemonset and service:
+- Step 2 - On one node (primary for example), delete and re-apply the Kubernetes daemonset:
 
 ```shell
 kubectl delete -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
@@ -174,7 +169,6 @@ kubectl apply -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
 ```shell
 kubectl get pods -l app=snmpd-monitor -o wide 
 kubectl get daemonset -l app=snmpd-monitor
-kubectl get service -l app=snmpd-monitor
 ```
 
 # SNMP for CVA appliance

@@ -3,7 +3,7 @@
 
 FROM alpine:3.19.0
 
-RUN apk --update --no-cache add net-snmp net-snmp-tools
+RUN apk --update --no-cache add net-snmp=5.9.4-r0 net-snmp-tools=5.9.4-r0
 
 COPY container-files /
 

@@ -16,6 +16,7 @@ spec:
       labels:
         app: snmpd-monitor
     spec:
+      hostNetwork: true
       containers:
       - image: net_snmp_image:latest
         imagePullPolicy: Never

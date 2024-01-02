@@ -18,7 +18,7 @@ CMD ["/bootstrap.sh"]
 # Commands to build and save the image
 
 # 1. Building image
-# docker build --no-cache -t net_snmp_image:latest .
+# docker build --no-cache -t net_snmp_image:latest -t net_snmp_image:5.9.4 .
 
 # 2. Tests:
 # docker run --name docker-snmp -v $(pwd)/../snmpd.conf:/etc/snmp/snmpd.conf -it -d net_snmp_image:latest
@@ -27,5 +27,5 @@ CMD ["/bootstrap.sh"]
 # docker exec -it docker-snmp snmpwalk -v2c -c testing 127.0.0.1:161 1.3.6.1.2.1.25.1.1
 
 # 3. Saving image as a file
-# docker save net_snmp_image:latest -o net_snmp_image
+# docker save net_snmp_image -o net_snmp_image
 # tar -zcvf ../net_snmp_image-v5.9.tar.gz net_snmp_image

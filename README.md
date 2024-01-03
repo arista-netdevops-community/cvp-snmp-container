@@ -34,9 +34,9 @@ unzip /path/to/file/on/cvp/cvp-snmp-container-main.zip -d /cvpi/
 >  The repository directory on the cvp server must be exactly `/cvpi/cvp-snmp-container-main/`
 
 
-## Step 2: Modify the snmpd.conf files to match your requirements.  
+## Step 2: Modify the snmpd.conf file to match your requirements.  
 
-By default, the configuration files have the following content (using v2c "testing" community string, and v3 arista user): 
+By default, the configuration file has the following content (using v2c "testing" community string, and v3 arista user): 
 
 ```text
 # Global information
@@ -47,13 +47,13 @@ syscontact "admin"
 # Warning: Do not modify this port as this is the port open INSIDE the Kubernetes pod. 
 # If you wish to modify the host port opened, check the snmpd-monitor.yaml file.
 agentAddress udp:161
+agentuser root
 
 # For SNMPv2c
-agentuser root
 rocommunity testing
 
 # For SNMPv3:
-createUser arista SHA-512 "arista1234" AES-256 "arista1234"
+createUser arista SHA-512 'arista1234' AES-256 'arista1234'
 rouser arista
 ```
 

@@ -25,7 +25,14 @@ tar -xf cvp-snmp-container-main.tar.gz
 cd cvp-snmp-container-main/
 ```
 
-Otherwise, just download the package as a .tar.gz to your computer and scp it manually to the CVP server.  
+Otherwise, download the package as a zip file (via the github web interface) to your computer and scp it to the CVP server.  
+Then:
+```
+unzip /path/to/file/on/cvp/cvp-snmp-container-main.zip -d /cvpi/
+```
+> **Note**
+>  The repository directory on the cvp server must be exactly `/cvpi/cvp-snmp-container-main/`
+
 
 ## Step 2: Modify the snmpd.conf files to match your requirements.  
 
@@ -52,13 +59,8 @@ rouser arista
 
 A complete list of examples is available in command [`man 5 snmpd.examples`](https://linux.die.net/man/5/snmpd.examples)
 
-## Step 3: Copy the config file to the correct location.
 
-```shell
-cp snmpd.conf /cvpi/snmpd.conf
-```
-
-## Step 4: Load the container image.
+## Step 3: Load the container image.
 
 - For CVP version `>= 2022.3.0` :
 
@@ -78,7 +80,7 @@ tar -xf net_snmp_image-v5.9.tar.gz && docker load -i net_snmp_image
 docker image ls | grep snmp
 ```
 
-## Step 5: Install a cron entry
+## Step 4: Install a cron entry
 
 A cronjob needs to be configured to avoid any downtime after an upgrade of CVP is performed (as during the upgrade all the container images are flushed).  
 This can be accomplished by installing the following cron entry.  
@@ -94,11 +96,11 @@ And add the following:
 @reboot /cvpi/cvp-snmp-container-main/load_image_on_boot.sh >> /cvpi/cvp-snmp-container-main/cron.log 2>&1
 ```
 
-## Step 6 (for multi-nodes)
+## Step 5: (for multi-nodes)
 
-If in a multi-node cluster, repeat Step 1, 2, 3, 4 and 5 on the secondary node and tertiary node.
+If in a multi-node cluster, repeat Step 1, 2, 3 and 4 on the secondary node and tertiary node.
 
-## Step 7: Create the Kubernetes deployment:
+## Step 6: Create the Kubernetes deployment:
 
 This needs to be run only on the primary server.
 
@@ -106,7 +108,7 @@ This needs to be run only on the primary server.
 kubectl apply -f snmpd-monitor.yaml
 ```
 
-## Step 8: Validation
+## Step 7: Validation
 
 From the CVP server, we can verify the status of the pods and deployment:
 
@@ -151,10 +153,10 @@ SNMPv2-MIB::sysName.0 = STRING: "arista-cvp-server-1"
 
 In case you need to modify the SNMP configuration after installation is complete, please follow the below steps.   
 
-- Step 1 - Modify the `/cvpi/snmpd.conf` file on each node:
+- Step 1 - Modify the `/cvpi/cvp-snmp-container-main/snmpd.conf` file on each node:
 
 ```shell
-vi /cvpi/snmpd.conf
+vi /cvpi/cvp-snmp-container-main/snmpd.conf
 ```
 
 - Step 2 - On one node (primary for example), delete and re-apply the Kubernetes daemonset:

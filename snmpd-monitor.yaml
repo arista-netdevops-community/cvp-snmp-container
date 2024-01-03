@@ -35,7 +35,7 @@ spec:
       - name: volume-snmpd-monitor
         hostPath:
         # directory location on host
-          path: /cvpi/snmpd.conf
+          path: /cvpi/cvp-snmp-container-main/snmpd.conf
           type: FileOrCreate
       - name: host-root-partition
         hostPath:

@@ -1,5 +1,5 @@
 SHELL := /bin/sh
-.PHONY: build reload sh cp cpmib
+.PHONY: build redeploy-dev redeploy sh cp cpmib
 
 VERSION := 5.9.4.1
 
@@ -11,7 +11,7 @@ build:
 	tar -czvf ../net_snmp_image.tar.gz net_snmp_image
 
 
-reload:
+redeploy-dev:
 	kubectl delete -f snmpd-monitor.yaml ;\
 	kubectl wait --for=delete pod -l app=snmpd-monitor --timeout=60s ;\
 	nerdctl image  --namespace=k8s.io rm  net_snmp_image:latest ;\
@@ -22,10 +22,21 @@ reload:
 	kubectl wait --for=condition=ready pod -l app=snmpd-monitor --timeout=60s
 	kubectl get pod -l app=snmpd-monitor
 
+redeploy:
+	kubectl delete -f snmpd-monitor.yaml ;\
+	kubectl wait --for=delete pod -l app=snmpd-monitor --timeout=60s ;\
+	nerdctl image rm  net_snmp_image:latest ;\
+	tar -xf net_snmp_image.tar.gz ;\
+	nerdctl image load -i net_snmp_image ;\
+	nerdctl image ls | grep net_snmp_image ;\
+	kubectl apply -f snmpd-monitor.yaml ;\
+	kubectl wait --for=condition=ready pod -l app=snmpd-monitor --timeout=60s
+	kubectl get pod -l app=snmpd-monitor
 
 test:
 	kubectl exec -it $(shell kubectl get pod -l app=snmpd-monitor -o jsonpath='{.items[0].metadata.name}') -- snmpwalk -v2c -c testing 127.0.0.1:161 1.3.6.1.2.1.1.5.0 ;\
 	kubectl exec -it $(shell kubectl get pod -l app=snmpd-monitor -o jsonpath='{.items[0].metadata.name}') -- snmpwalk -v2c -c testing localhost .1.3.6.1.3.53.8.0 ;\
+	kubectl exec -it $(shell kubectl get pod -l app=snmpd-monitor -o jsonpath='{.items[0].metadata.name}') -- snmpwalk -v2c -c testing localhost ARISTA-KUBERNETES-MIB::nbNodesInReadyState ;\
 	kubectl exec -it $(shell kubectl get pod -l app=snmpd-monitor -o jsonpath='{.items[0].metadata.name}') -- snmpwalk -v2c -c testing localhost ARISTA-KUBERNETES-MIB::k8sNodesInfo ;\
 	kubectl exec -it $(shell kubectl get pod -l app=snmpd-monitor -o jsonpath='{.items[0].metadata.name}') -- snmpwalk -v3  -l authPriv  -u arista -a SHA-512 -A 'arista1234' -x AES-256 -X 'arista1234'  localhost ARISTA-KUBERNETES-MIB::k8sPodsInfo
 

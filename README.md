@@ -5,7 +5,7 @@
 
 The goal of this project is to find a cleaner way to install snmpd packages on CVP: this will allow a _remote management SNMP system to monitor basic CVP server information_ (CPU, memory, disk space, ...).
 
-The following project will install **snmpd** version `5.9` in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
+The following project will install **snmpd** version `5.9.4` in a Kubernetes pod to make a cleaner and easier-to-maintain solution.
 
 This snmpd package does support modern cryptographic algorithms (such as `SHA-512` or `AES-256`).
 
@@ -65,7 +65,7 @@ A complete list of examples is available in command [`man 5 snmpd.examples`](htt
 - For CVP version `>= 2022.3.0` :
 
 ```shell
-tar -xf net_snmp_image-v5.9.tar.gz && nerdctl load -i net_snmp_image 
+tar -xf net_snmp_image.tar.gz && nerdctl load -i net_snmp_image
 
 # Verification: 
 nerdctl image ls  | grep snmp
@@ -74,7 +74,7 @@ nerdctl image ls  | grep snmp
 - For older CVP versions, use the following command:
 
 ```shell
-tar -xf net_snmp_image-v5.9.tar.gz && docker load -i net_snmp_image
+tar -xf net_snmp_image.tar.gz && docker load -i net_snmp_image
 
 # Verification:
 docker image ls | grep snmp

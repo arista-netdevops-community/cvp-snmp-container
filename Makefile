@@ -1,9 +1,12 @@
 SHELL := /bin/sh
 .PHONY: build reload sh cp cpmib
 
+VERSION := 5.9.4.1
+
 build:
-	docker build -f docker/Dockerfile --no-cache -t net_snmp_image:latest -t net_snmp_image:5.9.4.1 . ;\
-	docker save net_snmp_image:latest -o docker/net_snmp_image ;\
+	docker image prune -a -f ;\
+	docker build -f docker/Dockerfile --no-cache -t net_snmp_image:latest -t net_snmp_image:$(VERSION) . ;\
+	docker save net_snmp_image -o docker/net_snmp_image ;\
 	cd docker ;\
 	tar -czvf ../net_snmp_image.tar.gz net_snmp_image
 

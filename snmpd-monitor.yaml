@@ -17,6 +17,8 @@ spec:
         app: snmpd-monitor
     spec:
       hostNetwork: true
+      # Enable the pod to access the host's /proc filesystem
+      hostPID: true
       containers:
       - image: net_snmp_image:latest
         imagePullPolicy: Never

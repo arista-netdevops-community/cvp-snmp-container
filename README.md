@@ -178,8 +178,8 @@ kubectl get daemonset -l app=snmpd-monitor
 
 # Kubernetes monitoring
 
-A Kubernetes OID and MIB are also available to monitor Kubernetes resources.  
-The MIB is available here `ARISTA-KUBERNETES-MIB.txt`.  
+Some OIDs and one MIB file are also available to monitor Kubernetes resources.  
+The MIB file is available here `ARISTA-KUBERNETES-MIB.txt`.  
 The 4 following OIDs are available:
 * `nbPodsInRunningState`: Number of Kubernetes pods in Running state
 * `nbNodesInReadyState`: Number of Kubernetes nodes in Ready state
@@ -188,6 +188,7 @@ The 4 following OIDs are available:
 
 Example:
 ```
+# Where 'mibs' is a local directory containing the file (ARISTA-KUBERNETES-MIB.txt)
 $ snmpwalk -v2c -M+mibs -c testing 10.83.13.33 ARISTA-KUBERNETES-MIB::nbNodesInReadyState
 ARISTA-KUBERNETES-MIB::nbNodesInReadyState = INTEGER: 3
 ```

@@ -14,6 +14,7 @@ py3-pip=23.3.1-r0 \
 
 
 COPY --chmod=0777 docker/container-files/kubernetes.py /kubernetes.py
+COPY --chmod=0777 ARISTA-KUBERNETES-MIB.txt /usr/share/snmp/mibs/ARISTA-KUBERNETES-MIB.txt
 
 
 # Expose the snmp port
@@ -26,7 +27,7 @@ CMD snmpd -a -c /etc/snmp/snmpd.conf -f -Lo -C -p /var/run/snmpd.pid
 # Commands to build and save the image
 
 # 1. Building image
-# docker build --no-cache -t net_snmp_image:latest -t net_snmp_image:5.9.4 .
+# docker build --no-cache -t net_snmp_image:latest -t net_snmp_image:5.9.4.1 .
 
 # 2. Tests:
 # docker run --name docker-snmp -v $(pwd)/../snmpd.conf:/etc/snmp/snmpd.conf -it -d net_snmp_image:latest
@@ -34,6 +35,9 @@ CMD snmpd -a -c /etc/snmp/snmpd.conf -f -Lo -C -p /var/run/snmpd.pid
 # docker exec -it docker-snmp snmpwalk -v2c -c testing 127.0.0.1:161 1.3.6.1.2.1.1.5.0
 # docker exec -it docker-snmp snmpwalk -v2c -c testing 127.0.0.1:161 1.3.6.1.2.1.25.1.1
 # docker exec -it docker-snmp snmpwalk -v3  -l authPriv  -u arista -a SHA-512 -A 'arista1234' -x AES-256 -X 'arista1234'  localhost .1.3.6.1.3.53.8.0.2
+# docker exec -it docker-snmp snmpwalk -v2c -c testing localhost .1.3.6.1.3.53.8.0
+# docker exec -it docker-snmp snmpwalk -v2c -c testing localhost ARISTA-KUBERNETES-MIB::k8sPodsInfo
+# docker exec -it docker-snmp snmptranslate  -On ARISTA-KUBERNETES-MIB::nbPodsInRunningState
 
 # 3. Saving image as a file
 # docker save net_snmp_image -o net_snmp_image

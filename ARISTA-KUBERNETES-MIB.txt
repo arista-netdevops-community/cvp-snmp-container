@@ -1,0 +1,39 @@
+ARISTA-KUBERNETES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, experimental FROM SNMPv2-SMI;
+
+k8sEntry MODULE-IDENTITY
+    LAST-UPDATED "202402270000Z"
+    ORGANIZATION "Arista Networks"
+    CONTACT-INFO "guillaume.vilar@arista.com"
+    
+    DESCRIPTION "SNMP KUBERNETES MIB"
+    REVISION "202402270000Z"
+    DESCRIPTION "SNMP KUBERNETES MIB"
+    ::= { experimental 53 }
+
+    kubernetesInfo OBJECT IDENTIFIER ::= { k8sEntry 8 }
+
+nbPodsInRunningState OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of pods in Running state."
+    ::= { kubernetesInfo 0 }
+
+k8sNodesInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Kubernetes nodes information."
+    ::= { kubernetesInfo 1 }
+
+k8sPodsInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Kubernetes pods information."
+    ::= { kubernetesInfo 2 }
+
+END

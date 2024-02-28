@@ -31,27 +31,31 @@ def call_command(command):
     output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
     return output.decode("ascii")
 
-def call_command_with_pipe(command1, command2):
+
+def count_string_in_cmd_output_and_add_at_position(position_in_tree, commands, string_to_count):
     """
-    call_command_with_pipe Execute the commands in a subprocess as `command1 | command2`. Return the output decoded in ascii.
+    count_string_in_cmd_output_and_add_at_position Execute the command and count the number of times the string_to_count is present in the output and add it to the tree.
     Parameters
     ----------
-    command1 : list
-        The command to call as a list (Ex: ['kubectl', 'get', 'nodes', '-o', 'wide'])
-    command2 : list
-        The command to call as a list (Ex: ['wc',  '-l'])
+    position_in_tree : str
+        Position in the tree to add the data (Ex: '0.' for the first level of the tree)
+    commands : list
+        The command to call as a list (Ex: ['kubectl', 'get', 'nodes', '-o', 'wide']).
+    string_to_count : str
+        The string to count in the output of the command
     Returns
     -------
-    str
-        The output of the command decoded in ascii
+    None
     """
-    # logging.debug(f"Calling commands with pipe: {command1} - {command2}")
-    ps = subprocess.Popen(command1, stdout=subprocess.PIPE)
-    output = subprocess.check_output(command2, stdin=ps.stdout)
-    ps.wait()
-    return output.decode("ascii")
+    info_from_subprocess = call_command(commands)
+    # logging.debug(f"Info from subprocess: {info_from_subprocess}")
+    count = info_from_subprocess.count(string_to_count)
+    # logging.debug(f"Count: {count}")
+    position = position_in_tree[:-1] # Remove the last dot in position string
+    pp.add_int(position, count)
 
-def add_command_in_tree_at_position(position_in_tree, commands, has_pipe=False, is_int=False):
+
+def add_command_in_tree_at_position(position_in_tree, commands):
     """
     add_command_in_tree_at_position Execute the command and add it to the pass persist object at position_in_tree.
     Parameters
@@ -60,38 +64,28 @@ def add_command_in_tree_at_position(position_in_tree, commands, has_pipe=False, 
         Position in the tree to add the data (Ex: '0.' for the first level of the tree)
     commands : list
         The command to call as a list (Ex: ['kubectl', 'get', 'nodes', '-o', 'wide']).
-        If has_pipe is True, expected a list of two commands (Ex: [['kubectl', 'get', 'pods'], ['wc',  '-l']])
-    has_pipe : bool, optional
-        If True, the commands will be executed with a pipe (default is False).
     Returns
     -------
     None
     """
-    if has_pipe:
-        info_from_subprocess = call_command_with_pipe(commands[0], commands[1])
-        position = position_in_tree[:-1] # Removing the last dot from the position string.
-        # logging.debug(f"Adding value at [{position}] : '{info_from_subprocess}'")
-        if is_int:
-            pp.add_int(position, int(info_from_subprocess))
-        else:
-            pp.add_str(position, info_from_subprocess)
-
-    else:
-        info_from_subprocess = call_command(commands)
-        # Split the string into lines
-        lines = info_from_subprocess.strip().split('\n')
-        # logging.debug(f"Lines: {lines}")
-        
-        # Process each line (excluding the first line of headers)
-        for index_line, line in enumerate(lines[1:]):
-            position = position_in_tree + str(index_line)
-            pp.add_str(position, line)
+    info_from_subprocess = call_command(commands)
+    # Split the string into lines
+    lines = info_from_subprocess.strip().split('\n')
+    # logging.debug(f"Lines: {lines}")
+    
+    # Process each line (excluding the first line of headers)
+    for index_line, line in enumerate(lines[1:]):
+        position = position_in_tree + str(index_line)
+        pp.add_str(position, line)
 
 def update():
     # try:
-    add_command_in_tree_at_position("0.", [["kubectl", "get", "pods", "--all-namespaces", "--field-selector=status.phase=Running"], ["wc",  "-l"]], has_pipe=True, is_int=True)
-    add_command_in_tree_at_position("1.", ["kubectl", "get", "nodes", "-o", "wide"])
-    add_command_in_tree_at_position("2.", ["kubectl", "get", "pods", "-o", "wide", "--all-namespaces"])
+
+    count_string_in_cmd_output_and_add_at_position("0.", ["kubectl", "get", "pods", "--all-namespaces", "--field-selector=status.phase=Running"], "Running")
+    count_string_in_cmd_output_and_add_at_position("1.", ["kubectl", "get", "nodes"], "Ready")
+    
+    add_command_in_tree_at_position("2.", ["kubectl", "get", "nodes", "-o", "wide"])
+    add_command_in_tree_at_position("3.", ["kubectl", "get", "pods", "-o", "wide", "--all-namespaces"])
     # except Exception as e:
     #     logging.error(f"Error: {e}")
 

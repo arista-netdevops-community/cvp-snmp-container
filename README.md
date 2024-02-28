@@ -55,6 +55,9 @@ rocommunity testing
 # For SNMPv3:
 createUser arista SHA-512 'arista1234' AES-256 'arista1234'
 rouser arista
+
+# pass_persist for kubernetes monitoring
+pass_persist .1.3.6.1.3.53.8  /kubernetes.py
 ```
 
 A complete list of examples is available in command [`man 5 snmpd.examples`](https://linux.die.net/man/5/snmpd.examples)
@@ -171,6 +174,22 @@ kubectl apply -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
 ```shell
 kubectl get pods -l app=snmpd-monitor -o wide 
 kubectl get daemonset -l app=snmpd-monitor
+```
+
+# Kubernetes monitoring
+
+A Kubernetes OID and MIB are also available to monitor Kubernetes resources.  
+The MIB is available here `ARISTA-KUBERNETES-MIB.txt`.  
+The 4 following OIDs are available:
+* `nbPodsInRunningState`: Number of Kubernetes pods in Running state
+* `nbNodesInReadyState`: Number of Kubernetes nodes in Ready state
+* `k8sNodesInfo`: Kubernetes nodes info (output of `kubectl get nodes -o wide`)
+* `k8sPodsInfo`: Kubernetes pods info (output of `kubectl get pods --all-namespaces`)
+
+Example:
+```
+$ snmpwalk -v2c -M+mibs -c testing 10.83.13.33 ARISTA-KUBERNETES-MIB::nbNodesInReadyState
+ARISTA-KUBERNETES-MIB::nbNodesInReadyState = INTEGER: 3
 ```
 
 # SNMP for CVA appliance

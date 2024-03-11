@@ -6,7 +6,7 @@ FROM alpine:3.19.1
 RUN apk --update --no-cache add \
 net-snmp=5.9.4-r0 \
 net-snmp-tools=5.9.4-r0 \
-kubectl=1.28.4-r0 \
+kubectl=1.28.4-r1 \
 python3=3.11.8-r0 \
 py3-pip=23.3.1-r0 \
 && pip3 install snmp_passpersist==2.1.0 --break-system-packages
@@ -14,7 +14,8 @@ py3-pip=23.3.1-r0 \
 
 
 COPY --chmod=0777 docker/container-files/kubernetes.py /kubernetes.py
-COPY --chmod=0777 ARISTA-KUBERNETES-MIB.txt /usr/share/snmp/mibs/ARISTA-KUBERNETES-MIB.txt
+COPY ARISTA-KUBERNETES-MIB.txt /usr/share/snmp/mibs/ARISTA-KUBERNETES-MIB.txt
+COPY docker/container-files/kubeconfig.yaml /root/.kube/config
 
 
 # Expose the snmp port

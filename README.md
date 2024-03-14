@@ -5,7 +5,7 @@
 
 The goal of this project is to find a cleaner way to install snmpd packages on CVP: this will allow a _remote management SNMP system to monitor basic CVP server information_ (CPU, memory, disk space, ...).
 
-The following project will install **snmpd** version `5.9` in a Kubernetes pod to make a cleaner and easier-to-maintain solution. 
+The following project will install **snmpd** version `5.9.4` in a Kubernetes pod to make a cleaner and easier-to-maintain solution.
 
 This snmpd package does support modern cryptographic algorithms (such as `SHA-512` or `AES-256`).
 
@@ -55,6 +55,9 @@ rocommunity testing
 # For SNMPv3:
 createUser arista SHA-512 'arista1234' AES-256 'arista1234'
 rouser arista
+
+# pass_persist for kubernetes monitoring
+pass_persist .1.3.6.1.3.53.8  /kubernetes.py
 ```
 
 A complete list of examples is available in command [`man 5 snmpd.examples`](https://linux.die.net/man/5/snmpd.examples)
@@ -65,7 +68,7 @@ A complete list of examples is available in command [`man 5 snmpd.examples`](htt
 - For CVP version `>= 2022.3.0` :
 
 ```shell
-tar -xf net_snmp_image-v5.9.tar.gz && nerdctl load -i net_snmp_image 
+tar -xf net_snmp_image.tar.gz && nerdctl load -i net_snmp_image
 
 # Verification: 
 nerdctl image ls  | grep snmp
@@ -74,7 +77,7 @@ nerdctl image ls  | grep snmp
 - For older CVP versions, use the following command:
 
 ```shell
-tar -xf net_snmp_image-v5.9.tar.gz && docker load -i net_snmp_image
+tar -xf net_snmp_image.tar.gz && docker load -i net_snmp_image
 
 # Verification:
 docker image ls | grep snmp
@@ -171,6 +174,23 @@ kubectl apply -f /cvpi/cvp-snmp-container-main/snmpd-monitor.yaml
 ```shell
 kubectl get pods -l app=snmpd-monitor -o wide 
 kubectl get daemonset -l app=snmpd-monitor
+```
+
+# Kubernetes monitoring
+
+Some OIDs and one MIB file are also available to monitor Kubernetes resources.  
+The MIB file is available here `ARISTA-KUBERNETES-MIB.txt`.  
+The 4 following OIDs are available:
+* `nbPodsInRunningState`: Number of Kubernetes pods in Running state
+* `nbNodesInReadyState`: Number of Kubernetes nodes in Ready state
+* `k8sNodesInfo`: Kubernetes nodes info (output of `kubectl get nodes -o wide`)
+* `k8sPodsInfo`: Kubernetes pods info (output of `kubectl get pods --all-namespaces`)
+
+Example:
+```
+# Where 'mibs' is a local directory containing the file (ARISTA-KUBERNETES-MIB.txt)
+$ snmpwalk -v2c -M+mibs -c testing 10.83.13.33 ARISTA-KUBERNETES-MIB::nbNodesInReadyState
+ARISTA-KUBERNETES-MIB::nbNodesInReadyState = INTEGER: 3
 ```
 
 # SNMP for CVA appliance
